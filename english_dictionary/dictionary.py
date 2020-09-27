@@ -2,12 +2,19 @@ import json
 from difflib import get_close_matches
 
 def translate(data, word):
+    match = get_close_matches(word, data.keys())
     if word in data:
         return data[word]
-    elif len(get_close_matches(word, data.keys())) > 0:
-        return get_close_matches(word, data.keys())
+    elif len(match) > 0:
+        yn = input(f"Do you mean {match[0]}, Y/N ")
+        if yn.lower() == "y":
+            return data[match[0]]
+        elif yn.lower() == "n":
+            return f"'{word}' is not in our database yet, please try another"
+        else:
+            return "We didn't understand your choice"
     else:
-        return
+        return f"'{word}' is not in our database yet, please try another"
 
 if __name__ == "__main__":
     word = input("Enter word : ")
@@ -15,8 +22,8 @@ if __name__ == "__main__":
     with open(filename, "r") as file:
         data = json.loads(file.read())
     result = translate(data, word.lower())
-    if result:
+    if type(result) == list:
         for item in result:
             print(item)
     else:
-        print(f"'{word}' is not in our database yet, please try another")
+        print(result)
